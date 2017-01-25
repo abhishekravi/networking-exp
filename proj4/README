@@ -1,0 +1,51 @@
+Project 4: Raw Sockets
+----------------------
+We used python to code this experiment. We have seperated the program into 4 files
+
+Files:
+-----
+HttpHandler.py : This contains code that handles the http layer
+tcpHandler.py : This contains code that handles the tcp layer
+ipHandler.py : This contains code that handles the ip layer
+common.py : This contains common methods used inbetween different layers
+
+utility files:
+fileCompare.py : check the content of 2 files by comparing all lines
+
+HTTP layer:
+----------
+For the Http layer, we check if the input is correct and then create a tcpHandler object. using this object we send the http request for the file and revceive the file content. The http code of the response if verified, i.e it has to be 200, if not we stop the program.
+after verifying the code, we write the content received into a file and end the program
+
+TCP layer:
+----------
+In the TCP layer, we create a ipHandler object. using this object we send the http request along with the tcp header built over to the ip later. Before sending the http payload, we perform a 3way handshake to establish with the server about what sequence numbers are going to be used. Once the handshake is over, we start receving the file content. We have an expected ack and expected sequence number variables, which are used to check if we are receiving the packet that is expected. if not the packet is dropped and we wait for a retransmit of the packet that we want by sending ack for the prev packet received. 
+
+Each time we get a pakcet, other than checking the seq number we also validate the checksum. We also verify if the packet received has the proper port numbers
+
+When the server sends a packet with fin flag set, we know that we have received the whole content, we also send a fin flag to the server to close the connection. We then send the accumulated packet content, i.e the whole file to the http layer, when it is processed
+
+IP layer
+--------
+In the ip later, we create the raw sockets which are going to be used to read and write content. here we receive data from the tcp layer, which is attached as payload to the ip packet that we create. We create the ip header by including the sender and destination information.
+This is then sent using the send socket
+
+The recceive socket is then used to read messages from the server. Since raw sockets read all packet traffic, we filter out and take only what we want by checking the destination and source address.
+Once we get the packet we verify the checksum and then pass it over to the tcp layer for further processing
+
+Testing:
+-------
+We tested our code on Project page, 2MB file, 10 MB file and 50 MB file. 
+All network activities were observed using wireshark.
+we wrote a small program to comapare the downloaded files with the original files. It compares them line by line and also compares the md5 checksum of both files
+
+Challenges faced: 
+----------------
+It took a while to get the three way handshake working, we just had to get the sequence numbers right! 
+checksum caluculation was always failing for the 10mb file, but wire shark showed it to have good checksum. We then realized the we did not handle messages with odd length. We solved this problem, by padding a zero at the end to make such message lengths even
+
+Note: The rawhttpget file can be run to execute the program. It has to be run using root privilage for the program to work. The ip tables also have to be modified using the command iptables -A OUTPUT -p tcp --tcp-flags RST RST -j DROP
+
+Contribution:
+Abhishek --> TCP and IP
+Keerthi --> HTTP and TCP

@@ -1,0 +1,64 @@
+#! /bin/bash
+servers=(ec2-52-0-73-113.compute-1.amazonaws.com 
+ec2-52-16-219-28.eu-west-1.compute.amazonaws.com 
+ec2-52-11-8-29.us-west-2.compute.amazonaws.com 
+ec2-52-8-12-101.us-west-1.compute.amazonaws.com 
+ec2-52-28-48-84.eu-central-1.compute.amazonaws.com 
+ec2-52-68-12-77.ap-northeast-1.compute.amazonaws.com 
+ec2-52-74-143-5.ap-southeast-1.compute.amazonaws.com 
+ec2-52-64-63-125.ap-southeast-2.compute.amazonaws.com 
+ec2-54-94-214-108.sa-east-1.compute.amazonaws.com)
+
+ind=1
+
+if test "$#" -ne 10; then
+	echo "wrong num of args found"
+	exit 1
+fi
+
+while test $ind -lt 11;
+do
+	n=$(( ind + 1 ))	
+	case ${!ind} in
+		-p)
+			port=${!n}
+			ind=$((ind+2))
+			;;
+		-o)
+			origin=${!n}
+			ind=$((ind+2))
+			;;
+		-n)
+			name=${!n}
+			ind=$((ind+2))
+			;;
+		-u)
+			user=${!n}
+			ind=$((ind+2))
+			;;
+		-i)
+			key=${!n}
+			ind=$((ind+2))
+			;;
+		?)
+			echo "invalid input"
+			exit 1
+			;;
+	esac
+done
+for s in "${servers[@]}"
+do
+		echo "deploying in " $s
+		ssh -i $key $user@$s 'mkdir ~/Proj5'
+    scp -i $key currentPerformance.py $user@$s:~/Proj5
+    scp -i $key performanceReader $user@$s:~/Proj5
+    scp -i $key httpserver $user@$s:~/Proj5
+    scp -i $key ReqHandler.class $user@$s:~/Proj5
+    scp -i $key Server.class $user@$s:~/Proj5
+done
+
+echo "deploying in " cs5700cdnproject.ccs.neu.edu
+ssh -i $key $user@cs5700cdnproject.ccs.neu.edu 'mkdir ~/Proj5'
+scp -i $key pathFinder.py $user@cs5700cdnproject.ccs.neu.edu:~/Proj5
+scp -i $key dnsserver $user@cs5700cdnproject.ccs.neu.edu:~/Proj5
+scp -i $key DNSServer.py $user@cs5700cdnproject.ccs.neu.edu:~/Proj5

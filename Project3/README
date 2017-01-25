@@ -1,0 +1,97 @@
+Analysis of TCP protocols:
+
+Our code includes the following files
+
+TCL Scripts:
+experiment1.tcl
+experiment2.tcl
+experiment3.tcl
+
+Python Scripts
+experiment1.py
+experiment2.py
+experiment3.py
+
+Experiment1: Run experiment1.py it will generate 3 .csv files, which can be opened using Excel.
+Experiment2: Run experiment2.py it will generate 3 .csv files, which can be opened using Excel.
+Experiment3: Run experiment3.py it will generate 4 .csv files, which can be opened using Excel.
+
+Graphs were drawn using Excel.
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+Experiment 1: TCP Performance Under Congestion
+
+This experiment is to find out the performance of different types of TCP variants (Tahoe, Reno, NewReno and Vegas) under different network congestion conditions.
+
+For this experiment we did the following:
+We are of varying the following:
+1. TCP variants (Tahoe, Reno, NewReno and Vegas)
+2. different UDP rate (1-11 Mbps)
+3. start time of both flows([TCP first, UDP next], [UDP first, TCP next], [Both at the same time]
+
+This can be represented by the following nested loop pseudo code:
+
+for( Tahoe, Reno, NewReno and Vegas) {
+	for([1,2,3,4,5,6,7,8,9,10]) {
+		for((variants of [UDPtime TCPtime]) {
+			(process...)
+		}
+	}
+}
+
+We processed the output of all the trace-files and calculated throughput, latency and drop-rate.  Each TCP variant had 33 different values for throughput, latency and drop-rate, we then calculated mean and found out which variant performs better.
+We ploted graphs for throughput, latency and drop-rate, with throughput on one axis and various CBR on the other axis. 
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+Experiment 2: Fairness Between TCP Variants
+
+This experiment is to find out how fair different TCP variants are to each other in a common network. 
+
+We compared the following pairs:
+Reno/Reno, NewReno/Reno, Vegas/Vegas and NewReno/Vegas
+
+For this experiment we did the following:
+We are of varying the following:
+1. TCP variant pairs(Reno/Reno, NewReno/Reno, Vegas/Vegas and NewReno/Vegas)
+2. different UDP rate (1-10 Mbps)
+3. start time of UDP and TCP flows([TCP variants first, UDP next], [UDP first, TCP variants next], [Both at the same time]
+4. start time of different TCP flows([TCP1 first, TCP2 next], [TCP2 first, TCP1 next], [Both TCPs at the same time])
+
+This can be represented by the following nested loop pseudo code:
+
+for( Reno/Reno, NewReno/Reno, Vegas/Vegas and NewReno/Vegas) {
+	for([1,2,3,4,5,6,7,8,9,10]) {
+		for((variants of [TCPtime]) {
+			(for (variants of [TCP1 time , TCP2 time]) {
+				(process...)
+		}
+	}
+}
+
+We processed the output of all the trace-files and calculated throughput, latency and drop-rate. Each TCP pair had 99 different values for throughput, latency and drop-rate, we then calculated mean and found out which performs better.
+We plotted graphs for throughput, latency and drop-rate, for both TCP variants in a pair with throughput on one axis and various CBR on the other axis.
+  
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+Experiment 3: Influence of Queuing
+
+This experiment is to find out how fair different TCP variants (TCP Reno and TCP SACK)  work under different queuing disciplines (DropTail and Random Early Drop).
+
+
+For this experiment we did the following approach:
+We are of varying the following:
+1. TCP variants (TCP Reno and TCP SACK)
+2. different Queuing disciplines (DropTail and RED)
+
+This can be represented by the following nested loop pseudo code:
+
+for( TCP Reno and TCP SACK) {
+	for(DropTail and RED) {
+		(process...)
+	}
+}
+
+Using the data we got, we plotted a graph with throughput and time, to see which queuing discipline is better suited for which TCP variant.  
+
+-------------------------------------------------------------------------------------------------------------------------------------------------- 
